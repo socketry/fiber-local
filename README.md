@@ -68,6 +68,10 @@ We welcome contributions to this project.
 4.  Push to the branch (`git push origin my-new-feature`).
 5.  Create new Pull Request.
 
+## See Also
+
+  - [thread-local](https://github.com/socketry/thread-local) — Strictly thread-local variables.
+
 ## License
 
 Released under the MIT license.
