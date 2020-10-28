@@ -22,6 +22,6 @@
 
 class Fiber
 	module Local
-		VERSION = "0.0.0"
+		VERSION = "0.1.0"
 	end
 end
