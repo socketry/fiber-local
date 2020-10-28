@@ -2,24 +2,24 @@
 
 A module to simplify fiber-local state.
 
-[![Development](https://github.com/socketry/fiber-local/workflows/Development/badge.svg?branch=master)](https://github.com/socketry/fiber-local/actions?workflow=Development)
+[![Development Status](https://github.com/socketry/fiber-local/workflows/Development/badge.svg)](https://github.com/socketry/fiber-local/actions?workflow=Development)
 
 ## Features
 
-- Easily access fiber-local state from a fiber.
-- Default to shared thread-local state.
+  - Easily access fiber-local state from a fiber.
+  - Default to shared thread-local state.
 
 ## Installation
 
-```
-bundle add fiber-local
+``` bash
+$ bundle add fiber-local
 ```
 
 ## Usage
 
 In your own class, e.g. `Logger`:
 
-```ruby
+``` ruby
 class Logger
 	extend Fiber::Local
 	
@@ -35,7 +35,7 @@ end
 
 Now, instead of instantiating your cache `LOGGER = Logger.new`, use `Logger.instance`. It will return a thread-local instance.
 
-```ruby
+``` ruby
 Thread.new do
 	Logger.instance
 	# => #<Logger:0x000055a14ec6be80>
@@ -49,7 +49,7 @@ end
 
 In cases where you have job per fiber or request per fiber, you might want to collect all log output for a specific fiber, you can do the following:
 
-```ruby
+``` ruby
 Logger.instance
 # => #<Logger:0x000055a14ec6be80>
 
@@ -60,11 +60,13 @@ end
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+We welcome contributions to this project.
+
+1.  Fork it.
+2.  Create your feature branch (`git checkout -b my-new-feature`).
+3.  Commit your changes (`git commit -am 'Add some feature'`).
+4.  Push to the branch (`git push origin my-new-feature`).
+5.  Create new Pull Request.
 
 ## License
 
