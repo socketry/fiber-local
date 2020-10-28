@@ -55,6 +55,7 @@ Logger.instance
 
 Fiber.new do
 	Logger.instance = Logger.new
+	# => #<Logger:0x000055a14ec597d0>
 end
 ```
 

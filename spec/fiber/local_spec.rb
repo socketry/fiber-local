@@ -52,7 +52,7 @@ RSpec.describe Fiber::Local do
 	describe '#instance=' do
 		let(:object) {Object.new}
 		
-		it "can assign an object to the thread local instance" do
+		it "can assign an object to the fiber local instance" do
 			MyThing.instance = object
 			
 			expect(MyThing.instance).to be object
