@@ -21,9 +21,20 @@
 # THE SOFTWARE.
 
 require_relative "local/version"
+require_relative "local/inheritable"
 
 class Fiber
 	module Local
+		def self.extended(klass)
+			instance_attribute_name = klass.name.gsub('::', '_')
+			klass.instance_variable_set(:@instance_attribute_name, instance_attribute_name)
+			klass.instance_variable_set(:@instance_variable_name, :"@#{instance_attribute_name}")
+			
+			Thread.attr_accessor(instance_attribute_name)
+			Fiber.attr_accessor(instance_attribute_name)
+			Fiber.inheritable(instance_attribute_name) if klass.inheritable?
+		end
+		
 		# Instantiate a new thread-local object.
 		# By default, invokes {new} to generate the instance.
 		# @returns [Object]
@@ -31,23 +42,24 @@ class Fiber
 			self.new
 		end
 		
+		def inheritable?
+			true
+		end
+		
 		# Get the current thread-local instance. Create it if required.
 		# @returns [Object] The thread-local instance.
 		def instance
-			thread = Thread.current
-			name = self.name
-			
-			if instance = thread[self.name]
+			fiber = Fiber.current
+			if instance = fiber.instance_variable_get(@instance_variable_name)
 				return instance
 			end
 			
-			unless instance = thread.thread_variable_get(name)
+			thread = Thread.current
+			unless instance = thread.instance_variable_get(@instance_variable_name)
 				if instance = self.local
-					thread.thread_variable_set(name, instance)
+					thread.instance_variable_set(@instance_variable_name, instance)
 				end
 			end
-			
-			thread[self.name] = instance
 			
 			return instance
 		end
@@ -55,8 +67,7 @@ class Fiber
 		# Assigns to the fiber-local instance.
 		# @parameter instance [Object] The object that will become the thread-local instance.
 		def instance= instance
-			thread = Thread.current
-			thread[self.name] = instance
+			Fiber.current.instance_variable_set(@instance_variable_name, instance)
 		end
 	end
 end
