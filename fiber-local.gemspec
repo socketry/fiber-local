@@ -12,10 +12,12 @@ Gem::Specification.new do |spec|
 	
 	spec.homepage = "https://github.com/socketry/fiber-local"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
 	spec.required_ruby_version = ">= 2.5.0"
 	
+	spec.add_development_dependency "bake-test"
+	spec.add_development_dependency "bake-test-external"
 	spec.add_development_dependency "bundler"
 	spec.add_development_dependency "covered"
 	spec.add_development_dependency "rspec"
