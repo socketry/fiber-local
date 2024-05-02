@@ -51,6 +51,8 @@ describe Fiber::Local do
 		end
 		
 		it "inherits assigned values in nested threads" do
+			skip_unless_minimum_ruby_version("3.2")
+			
 			instance = Object.new
 			
 			storage = Thread.new do
