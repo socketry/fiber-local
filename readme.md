@@ -1,63 +1,14 @@
 # Fiber::Local
 
-A module to simplify fiber-local state.
+A module to simplify fiber-local state. This provides a convenient interface for providing a default per-thread instance, while allowing per-fiber overrides (e.g. per-request state handling).
 
 [![Development Status](https://github.com/socketry/fiber-local/workflows/Test/badge.svg)](https://github.com/socketry/fiber-local/actions?workflow=Test)
 
-## Features
-
-  - Easily access fiber-local state from a fiber.
-  - Default to shared thread-local state.
-
-## Installation
-
-``` bash
-$ bundle add fiber-local
-```
-
 ## Usage
 
-In your own class, e.g. `Logger`:
+Please see the [project documentation](https://socketry.github.io/fiber-local/) for more details.
 
-``` ruby
-class Logger
-	extend Fiber::Local
-	
-	def initialize
-		@buffer = []
-	end
-	
-	def log(*arguments)
-		@buffer << arguments
-	end
-end
-```
-
-Now, instead of instantiating your cache `LOGGER = Logger.new`, use `Logger.instance`. It will return a thread-local instance.
-
-``` ruby
-Thread.new do
-	Logger.instance
-	# => #<Logger:0x000055a14ec6be80>
-end
-
-Thread.new do
-	Logger.instance
-	# => #<Logger:0x000055a14ec597d0>
-end
-```
-
-In cases where you have job per fiber or request per fiber, you might want to collect all log output for a specific fiber, you can do the following:
-
-``` ruby
-Logger.instance
-# => #<Logger:0x000055a14ec6be80>
-
-Fiber.new do
-	Logger.instance = Logger.new
-	# => #<Logger:0x000055a14ec597d0>
-end
-```
+  - [Getting Started](https://socketry.github.io/fiber-local/guides/getting-started/index) - This guide will explain how and why to use `Fiber::Local` to simplify fiber-local state.
 
 ## Contributing
 
