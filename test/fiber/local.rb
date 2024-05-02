@@ -49,6 +49,22 @@ describe Fiber::Local do
 				MyThing.fiber_local_attribute_name => be_equal(instance)
 			)
 		end
+		
+		it "inherits assigned values in nested threads" do
+			instance = Object.new
+			
+			storage = Thread.new do
+				MyThing.instance = instance
+				
+				Thread.new do
+					Fiber.current.storage
+				end.value
+			end.value
+			
+			expect(storage).to have_keys(
+				MyThing.fiber_local_attribute_name => be_equal(instance)
+			)
+		end
 	end
 	
 	with '#instance=' do
