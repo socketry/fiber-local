@@ -4,6 +4,7 @@
 # Copyright, 2020-2024, by Samuel Williams.
 
 require_relative "local/version"
+require 'fiber/storage'
 
 class Fiber
 	module Local
