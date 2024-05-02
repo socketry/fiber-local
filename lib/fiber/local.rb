@@ -9,11 +9,16 @@ require 'fiber/storage'
 class Fiber
 	module Local
 		def self.extended(klass)
-			instance_attribute_name = klass.name.gsub('::', '_').gsub(/\W/, '').downcase
-			klass.instance_variable_set(:@instance_attribute_name, instance_attribute_name)
-			klass.instance_variable_set(:@instance_variable_name, :"@#{instance_attribute_name}")
+			attribute_name = klass.name.gsub('::', '_').gsub(/\W/, '').downcase.to_sym
 			
-			Thread.attr_accessor(instance_attribute_name)
+			# This is used for the general interface and fiber storage key:
+			klass.instance_variable_set(:@fiber_local_attribute_name, attribute_name)
+			klass.singleton_class.attr :fiber_local_attribute_name
+			
+			# This is used for reading and writing directly to the thread instance variables:
+			klass.instance_variable_set(:@fiber_local_variable_name, :"@#{attribute_name}")
+			
+			Thread.attr_accessor(attribute_name)
 		end
 		
 		# Instantiate a new thread-local object.
@@ -26,14 +31,16 @@ class Fiber
 		# Get the current thread-local instance. Create it if required.
 		# @returns [Object] The thread-local instance.
 		def instance
-			if instance = Fiber[@instance_variable_name]
+			# This is considered a local "override" in the dynamic scope of the fiber:
+			if instance = Fiber[@fiber_local_attribute_name]
 				return instance
 			end
 			
+			# This is generally the fast path:
 			thread = Thread.current
-			unless instance = thread.instance_variable_get(@instance_variable_name)
+			unless instance = thread.instance_variable_get(@fiber_local_variable_name)
 				if instance = self.local
-					thread.instance_variable_set(@instance_variable_name, instance)
+					thread.instance_variable_set(@fiber_local_variable_name, instance)
 				end
 			end
 			
@@ -43,7 +50,7 @@ class Fiber
 		# Assigns to the fiber-local instance.
 		# @parameter instance [Object] The object that will become the thread-local instance.
 		def instance= instance
-			Fiber[@instance_variable_name] = instance
+			Fiber[@fiber_local_attribute_name] = instance
 		end
 	end
 end
