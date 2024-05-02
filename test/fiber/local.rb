@@ -26,12 +26,12 @@ class MyThing
 	extend Fiber::Local
 end
 
-RSpec.describe Fiber::Local do
+describe Fiber::Local do
 	it "has a version number" do
-		expect(Fiber::Local::VERSION).not_to be nil
+		expect(Fiber::Local::VERSION).to be =~ /\d+\.\d+\.\d+/
 	end
 	
-	describe '#instance' do
+	with '#instance' do
 		it "creates unique instances in different threads" do
 			instance1 = Thread.new do
 				MyThing.instance
@@ -41,30 +41,34 @@ RSpec.describe Fiber::Local do
 				MyThing.instance
 			end.value
 			
-			expect(instance1).to_not be instance2
+			expect(instance1).not.to be_equal(instance2)
 		end
 		
 		it "returns same instance in same thread" do
-			expect(MyThing.instance).to be MyThing.instance
+			expect(MyThing.instance).to be_equal(MyThing.instance)
+		end
+		
+		it "inherits assigned values in same thread" do
+			Thread
 		end
 	end
 	
-	describe '#instance=' do
+	with '#instance=' do
 		let(:object) {Object.new}
 		
 		it "can assign an object to the fiber local instance" do
 			MyThing.instance = object
 			
-			expect(MyThing.instance).to be object
+			expect(MyThing.instance).to be_equal(object)
 		end
 		
 		it "has fiber local scope" do
 			Fiber.new do
 				MyThing.instance = object
-				expect(MyThing.instance).to be object
+				expect(MyThing.instance).to be_equal(object)
 			end
 			
-			expect(MyThing.instance).to_not be object
+			expect(MyThing.instance).not.to be_equal(object)
 		end
 	end
 end
