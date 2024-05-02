@@ -10,13 +10,18 @@ Gem::Specification.new do |spec|
 	spec.authors = ["Samuel Williams"]
 	spec.license = "MIT"
 	
+	spec.cert_chain  = ['release.cert']
+	spec.signing_key = File.expand_path('~/.gem/release.pem')
+	
 	spec.homepage = "https://github.com/socketry/fiber-local"
 	
-	spec.files = Dir.glob('{lib}/**/*', File::FNM_DOTMATCH, base: __dir__)
+	spec.metadata = {
+		"source_code_uri" => "https://github.com/socketry/fiber-local.git",
+	}
 	
-	spec.required_ruby_version = ">= 2.5.0"
+	spec.files = Dir.glob(['{lib}/**/*', '*.md'], File::FNM_DOTMATCH, base: __dir__)
 	
-	spec.add_development_dependency "bundler"
-	spec.add_development_dependency "covered"
-	spec.add_development_dependency "rspec"
+	spec.required_ruby_version = ">= 3.1"
+	
+	spec.add_dependency "fiber-storage"
 end
