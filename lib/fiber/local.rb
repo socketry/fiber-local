@@ -13,12 +13,16 @@ class Fiber
 			
 			# This is used for the general interface and fiber storage key:
 			klass.instance_variable_set(:@fiber_local_attribute_name, attribute_name)
-			klass.singleton_class.attr :fiber_local_attribute_name
 			
-			# This is used for reading and writing directly to the thread instance variables:
-			klass.instance_variable_set(:@fiber_local_variable_name, :"@#{attribute_name}")
-			
-			Thread.attr_accessor(attribute_name)
+			# Under Spinel the thread keeps the instance in its own variables (see #instance), with no accessors named at run time:
+			unless RUBY_ENGINE == "spinel"
+				klass.singleton_class.attr :fiber_local_attribute_name
+				
+				# This is used for reading and writing directly to the thread instance variables:
+				klass.instance_variable_set(:@fiber_local_variable_name, :"@#{attribute_name}")
+				
+				Thread.attr_accessor(attribute_name)
+			end
 		end
 		
 		# Instantiate a new thread-local object.
@@ -38,9 +42,18 @@ class Fiber
 			
 			# This is generally the fast path:
 			thread = Thread.current
-			unless instance = thread.instance_variable_get(@fiber_local_variable_name)
-				if instance = self.local
-					thread.instance_variable_set(@fiber_local_variable_name, instance)
+			if RUBY_ENGINE == "spinel"
+				# Spinel compiles no instance variable named at run time; the thread's own variables hold it.
+				unless instance = thread.thread_variable_get(@fiber_local_attribute_name)
+					if instance = self.local
+						thread.thread_variable_set(@fiber_local_attribute_name, instance)
+					end
+				end
+			else
+				unless instance = thread.instance_variable_get(@fiber_local_variable_name)
+					if instance = self.local
+						thread.instance_variable_set(@fiber_local_variable_name, instance)
+					end
 				end
 			end
 			
